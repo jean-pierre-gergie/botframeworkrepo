@@ -11,11 +11,19 @@ from botbuilder.core import (
     BotFrameworkAdapterSettings,
     TurnContext,
     BotFrameworkAdapter,
+    MemoryStorage,
+    ConversationState,
+    UserState
+
 )
 from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.schema import Activity, ActivityTypes
+# needed for cosmosDB
+from botbuilder.azure import CosmosDbStorage,CosmosDbConfig
 
-from bot import MyBot
+from bots import DialogAndWelcomeBot
+
+from dialogs import  MainDialog
 from config import DefaultConfig
 
 CONFIG = DefaultConfig()
@@ -53,14 +61,30 @@ async def on_error(context: TurnContext, error: Exception):
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
 
+#cosmosDBConfig to connect to an emulator
+
+key ="C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
+
+cosconfig= CosmosDbConfig("https://localhost:8081",
+                           key,
+                          "user_profile",
+                          "user_info"
+                          )
+COSMOSDBSTORE = CosmosDbStorage(cosconfig)
 
 ADAPTER.on_turn_error = on_error
 
+
+MEMORY = MemoryStorage()
+USER_STATE = UserState(MEMORY)
+CONVERSATION_STATE = ConversationState(MEMORY)
 # Create the Bot
-BOT = MyBot()
 
 
+DIALOG = MainDialog(USER_STATE,COSMOSDBSTORE)
+BOT = DialogAndWelcomeBot(CONVERSATION_STATE, USER_STATE, DIALOG)
 # Listen for incoming requests on /api/messages
+
 async def messages(req: Request) -> Response:
     # Main bot message handler.
     if "application/json" in req.headers["Content-Type"]:

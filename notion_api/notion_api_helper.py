@@ -4,9 +4,9 @@ import json
 class Notion():
     def __init__(self):
         self.titles =[]
-        self.apikey = 'secret_MzNkYE11EqQUboEQQeey4ONYK8apE5hxajSZ6DHzqkw'
+        self.apikey = 'secw'
         self.token= "Bearer " + self.apikey
-        self.data_base_id='4e9c5d7b9d124f14a117ddadd24b70bd'
+        self.data_base_id='4e9d'
         self.page_id=[]
 
     async def query_db(self):

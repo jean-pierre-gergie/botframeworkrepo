@@ -4,7 +4,7 @@ class GPT3():
 
     @staticmethod
     async def gpt3(stext):
-        openai.api_key = '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'
+        openai.api_key = 
         response = openai.Completion.create(
             model="davinci-instruct-beta",
             prompt=stext,
